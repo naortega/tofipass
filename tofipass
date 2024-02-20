@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Copyright (C) 2024  Ortega Froysa, Nicolás <nicolas@ortegas.org>
+# Author: Ortega Froysa, Nicolás <nicolas@ortegas.org>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+### NOTE:
+# Inspiration from passmenu. Check README.md for more information.
+
+set -euo pipefail
+
+if [ -z "$WAYLAND_DISPLAY" ]
+then
+	echo "This program only works with Wayland compositors."
+	exit 1
+fi
+
+if [ -z "$(which tofi)" ]
+then
+	echo "tofi program not found in PATH. Please install."
+	exit 1
+fi
+
+PASSWORD_DIR=${PASSWORD_STORE_DIR-$HOME/.password-store}
+
+if ! [ -d "$PASSWORD_DIR" ]
+then
+	echo "Password store does not exist at $PASSWORD_DIR."
+	echo "Have you initialized your password store?"
+	exit 1
+fi
+
+PASSWORDS=($(find "$PASSWORD_DIR" -type f -name '*.gpg' -not -name '.*'))
+PASSWORDS=("${PASSWORDS[@]#"${PASSWORD_DIR}"/}")
+PASSWORDS=("${PASSWORDS[@]%.gpg}")
+
+PASSWORD=$(printf '%s\n' "${PASSWORDS[@]}" | tofi)
+
+[ -z "$PASSWORD" ] && exit
+
+pass show -c "$PASSWORD"
