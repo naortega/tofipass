@@ -9,7 +9,7 @@ store](https://www.passwordstore.org/) using
 
 Simply copy the script to somewhere in your path.
 
-# License
+## License
 
 In compliance with passmenu license (which was an inspiration for this script
 and is mentioned above) this script is licensed with the GNU General Public
